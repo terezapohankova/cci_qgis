@@ -344,8 +344,7 @@ class CCI(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
             self.INPUT_FOLDER_L1,
             self.tr("Select Input Folder with Imagery -- Level 1 TP"),
-            behavior=QgsProcessingParameterFile.Folder,
-            defaultValue=r'/home/tereza/Downloads/LC09_L1TP_189026_20250604_20250604_02_T1'
+            behavior=QgsProcessingParameterFile.Folder
             )
         )
 
@@ -353,23 +352,22 @@ class CCI(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
             self.INPUT_FOLDER_L2,
             self.tr("Select Input Folder with Imagery -- Level 2 SP"),
-            behavior=QgsProcessingParameterFile.Folder,
-            defaultValue = r'/home/tereza/Downloads/LC09_L2SP_189026_20250604_20250605_02_T1'
+            behavior=QgsProcessingParameterFile.Folder
             )
         )
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
                 self.OUTPUT_FOLDER,
-                self.tr("Select Output Folder"),
-                defaultValue = r'/home/tereza/Downloads/OUTPUT')
+                self.tr("Select Output Folder")
+            )
         )
         
         self.addParameter(
             QgsProcessingParameterFile(
                 self.DTM,
                 self.tr("Digital Terrain Model [m]"),
-                defaultValue = r'/home/tereza/Downloads/dmr_l8.tif')
+            )
         )
         
         
