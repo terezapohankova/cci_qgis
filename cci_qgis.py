@@ -72,10 +72,10 @@ class CCI(QgsProcessingAlgorithm):
         return "Cooling Capacity Index"
 
     def group(self) -> str:
-        return "Example scripts"
+        return "Cooling Capacity Index"
 
     def groupId(self) -> str:
-        return "examplescripts"
+        return "cci"
 
     def shortHelpString(self) -> str:
         return "Example algorithm short description"
