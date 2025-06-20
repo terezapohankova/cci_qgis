@@ -40,6 +40,7 @@ class CCI(QgsProcessingAlgorithm):
     INPUT_FOLDER_L2 = "INPUT_L2"
     OUTPUT_FOLDER = "OUTPUT"
     DTM = "DTM"
+    MTL_FILE = "MTL_FILE"
     
     VEG_COEFF_B10 = "VEG_COEFF_B10"
     SOIL_COEFF_B10 = "SOIL_COEFF_B10"
@@ -345,6 +346,7 @@ class CCI(QgsProcessingAlgorithm):
             self.INPUT_FOLDER_L1,
             self.tr("Select Input Folder with Imagery -- Level 1 TP"),
             behavior=QgsProcessingParameterFile.Folder
+            
             )
         )
 
@@ -353,21 +355,30 @@ class CCI(QgsProcessingAlgorithm):
             self.INPUT_FOLDER_L2,
             self.tr("Select Input Folder with Imagery -- Level 2 SP"),
             behavior=QgsProcessingParameterFile.Folder
+            
             )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterFile(
+                self.MTL_FILE,
+                self.tr("Level 2 Metadata File (MTL)")
+                
+                )
         )
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
                 self.OUTPUT_FOLDER,
                 self.tr("Select Output Folder")
-            )
+                )
         )
         
         self.addParameter(
             QgsProcessingParameterFile(
                 self.DTM,
-                self.tr("Digital Terrain Model [m]"),
-            )
+                self.tr("Digital Terrain Model [m]")
+                )
         )
         
         
@@ -535,6 +546,7 @@ class CCI(QgsProcessingAlgorithm):
         input_folder_l2 = self.parameterAsString(parameters, self.INPUT_FOLDER_L2, context)
         output_folder = self.parameterAsString(parameters, self.OUTPUT_FOLDER, context)
         dtm = self.parameterAsString(parameters, self.DTM, context)
+        mtl = self.parameterAsString(parameters, self.MTL_FILE, context)
 
         # === Read user-defined emissivity coefficients for thermal bands B10 and B11 ===
         vege_coeff_b10 = float(self.parameterAsDouble(parameters, self.VEG_COEFF_B10, context))
@@ -584,17 +596,16 @@ class CCI(QgsProcessingAlgorithm):
 
         # === Parse Level 1 files for thermal bands and metadata ===
         for filename in os.listdir(input_folder_l1):
+            if not filename.lower().endswith('.tif'):
+                continue
             lower_name = filename.lower()
             if 'b10' in lower_name:
                 l1_dict['b10'] = os.path.join(input_folder_l1, filename)
             elif 'b11' in lower_name:
                 l1_dict['b11'] = os.path.join(input_folder_l1, filename)
-            elif 'mtl' in lower_name and lower_name.endswith('.json'):
-                mtl_path = os.path.join(input_folder_l1, filename)
-                break
 
         # === Read thermal metadata from MTL JSON file ===
-        with open(mtl_path, 'r') as f:
+        with open(mtl, 'r') as f:
             mtl_data = json.load(f)
 
         # Radiometric and thermal constants from metadata
@@ -616,6 +627,8 @@ class CCI(QgsProcessingAlgorithm):
             feedback.pushInfo(f"{band}: {path}")
         for band, path in l1_dict.items():
             feedback.pushInfo(f"{band}: {path}")
+            
+        feedback.pushInfo(f"{l1_dict}")
 
         # === Check that all required bands are present ===
         required_bands_l2 = ['b2','b3','b4','b5','b6','b7']
